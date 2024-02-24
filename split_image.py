@@ -121,7 +121,7 @@ def main(n):
 
     # path = "/home/vladimiregorov/PycharmProjects/Numbers/ai.jpg"
     new_size = (30*n, 30*n)  # Замените на желаемые размеры
-    new_path = "путь_к_выходному_изображению.jpg"
+    new_path = "output_img.jpg"
 
     change_image(path, new_size, new_path)
 
