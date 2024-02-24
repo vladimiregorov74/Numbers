@@ -140,7 +140,7 @@ class MyApp(QMainWindow, Ui_MainWindow):
         # Создаем объект QPixmap из файла
         pixmap = QPixmap('ai.jpg')
         big_side = 600
-        # Получаем ширину и высоту изображения
+        # Получаем ширину и высоту изображения и изменяем их не более 600 по большей стороне
         width = pixmap.width()
         height = pixmap.height()
         if width > height:
@@ -150,6 +150,7 @@ class MyApp(QMainWindow, Ui_MainWindow):
         else:
             height = big_side
             width = int(width*big_side/height)
+        # Убираем кнопки и выводим лейбел
         for i in self.dict_button.values():
             i.hide()
         label = QLabel('Label')
@@ -163,8 +164,6 @@ class MyApp(QMainWindow, Ui_MainWindow):
         label.setPixmap(QtGui.QPixmap.fromImage(scaled_image))
 
         self.verticalLayout.addWidget(label)
-
-
 
     def new_game(self):
         self.close()
