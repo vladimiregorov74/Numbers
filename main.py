@@ -1,14 +1,15 @@
 # This is a sample Python script.
 import os
+import shutil
 import sys
 import random
 
-from PyQt6.QtCore import Qt
-from PyQt6.QtGui import QPixmap, QIcon, QPalette
+
+from PyQt6.QtGui import QPixmap
 
 from field1 import Ui_MainWindow
 from PyQt6 import QtCore, QtGui
-from PyQt6.QtWidgets import QApplication, QMainWindow, QGridLayout, QPushButton, QLabel
+from PyQt6.QtWidgets import QApplication, QMainWindow, QGridLayout, QPushButton, QLabel, QFileDialog
 
 from split_image import main
 
@@ -34,6 +35,7 @@ class MyApp(QMainWindow, Ui_MainWindow):
         self.spinBox.hide()
         self.label.setText(text_label)
         self.button_new_game.clicked.connect(self.new_game)
+        self.action_2.triggered.connect(self.save_img)
 
         self.size = self.spinBox.value()  # размер игрового поля
         self.dict_piece = main(self.size)  # получаем кусочки картинки в словарь
@@ -41,6 +43,11 @@ class MyApp(QMainWindow, Ui_MainWindow):
         num0 = [i for i in range(int((self.size ** 2) / 2))]
         num = num0 + num0
         random.shuffle(num)
+        # если размер поля не четный
+        if self.size % 2 == 1:
+            l = int(len(num) / 2)
+            num.insert(l, -1)
+
         # Создаем словарик ключoм которого является индекс строки и столбца наших кнопок,
         # а значение цифры открываемые кнопками
         self.button_num = dict()
@@ -73,6 +80,12 @@ class MyApp(QMainWindow, Ui_MainWindow):
 
         self.verticalLayout.addLayout(self.field_layout)
         self.setMaximumWidth(self.size * 35 + 10)
+        # открываем центральную плашку при нечетном размере поля
+        if self.size % 2 == 1:
+            ind = f'{self.size // 2}{self.size // 2}'
+            self.set_image_to_button(self.dict_button["Button" + ind], ind)
+            self.dict_button["Button" + ind].setEnabled(False)
+            self.num_open_img = 1
 
     def button_clicked(self):
         # Обработчик нажатия на кнопку
@@ -91,6 +104,7 @@ class MyApp(QMainWindow, Ui_MainWindow):
             self.flag = 1
             self.first_num = num
             self.first_num_index = index
+
 
         else:
             # проверка на клик по одной и той-же кнопке
@@ -122,7 +136,6 @@ class MyApp(QMainWindow, Ui_MainWindow):
     def set_image_to_button(self, but, ind):
         # Преобразуем массив NumPy в изображение Pillow
         pillow_image = self.dict_piece[ind]
-
         # Записываем изображение не кнопке в файл
         paths = os.path.join(os.getcwd(), f"piece.jpg")
         pillow_image.save(paths)
@@ -144,12 +157,15 @@ class MyApp(QMainWindow, Ui_MainWindow):
         width = pixmap.width()
         height = pixmap.height()
         if width > height:
+            print('width=', width)
             if width > big_side:
-                width = big_side
                 height = int(height*big_side/width)
+                width = big_side
+
         else:
-            height = big_side
             width = int(width*big_side/height)
+            height = big_side
+
         # Убираем кнопки и выводим лейбел
         for i in self.dict_button.values():
             i.hide()
@@ -164,6 +180,25 @@ class MyApp(QMainWindow, Ui_MainWindow):
         label.setPixmap(QtGui.QPixmap.fromImage(scaled_image))
 
         self.verticalLayout.addWidget(label)
+        self.action_2.setEnabled(True)
+
+
+    def save_img(self):
+        options = QFileDialog.Option.ShowDirsOnly  # Показывать только директории
+
+        file_dialog = QFileDialog()
+        file_name, _ = file_dialog.getSaveFileName(self, "Save File", "", "JPEG Files (*.jpg)",
+                                                   options=options)
+
+        if file_name:
+            source_file = "ai.jpg"
+            destination_file = file_name
+            if destination_file.split('.')[-1] != "jpg" or destination_file.split('.')[-1] != "jpeg" :
+                destination_file = file_name + ".jpg"
+
+            shutil.copy(source_file, destination_file)
+            print(f"File '{source_file}' copied to '{destination_file}'")
+
 
     def new_game(self):
         self.close()
@@ -173,12 +208,10 @@ class MyApp(QMainWindow, Ui_MainWindow):
         window = MyApp(parent=self)
         window.show()
 
-
-# Press the green button in the gutter to run the script.
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = MyApp()
     window.show()
     sys.exit(app.exec())
 
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+

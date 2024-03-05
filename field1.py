@@ -44,7 +44,7 @@ class Ui_MainWindow(object):
         self.verticalLayout.addLayout(self.horizontalLayout)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(parent=MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 608, 23))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 608, 22))
         self.menubar.setObjectName("menubar")
         self.menuMenu = QtWidgets.QMenu(parent=self.menubar)
         self.menuMenu.setObjectName("menuMenu")
@@ -57,23 +57,28 @@ class Ui_MainWindow(object):
         self.action.setObjectName("action")
         self.action_3 = QtGui.QAction(parent=MainWindow)
         self.action_3.setObjectName("action_3")
+        self.action_2 = QtGui.QAction(parent=MainWindow)
+        self.action_2.setCheckable(False)
+        self.action_2.setEnabled(False)
+        self.action_2.setObjectName("action_2")
         self.menu.addAction(self.action_3)
+        self.menuMenu.addAction(self.action_2)
         self.menuMenu.addAction(self.menu.menuAction())
         self.menubar.addAction(self.menuMenu.menuAction())
-        MainWindow.adjustSize()
 
         self.retranslateUi(MainWindow)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
         _translate = QtCore.QCoreApplication.translate
-        MainWindow.setWindowTitle(_translate("MainWindow", "Открой картинку"))
+        MainWindow.setWindowTitle(_translate("MainWindow", "Плашки"))
         self.label.setText(_translate("MainWindow", "Выберите размер игрового поля от 6 до 15"))
         self.pushButton.setText(_translate("MainWindow", "Играть"))
         self.menuMenu.setTitle(_translate("MainWindow", "Menu"))
         self.menu.setTitle(_translate("MainWindow", "Разработано"))
-        self.action.setText(_translate("MainWindow", "Расстановка кораблей автоматически"))
+
         self.action_3.setText(_translate("MainWindow", "Егоров В.А."))
+        self.action_2.setText(_translate("MainWindow", "Сохранить полученную картинку"))
 
 
 if __name__ == "__main__":

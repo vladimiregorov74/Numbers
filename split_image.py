@@ -4,6 +4,14 @@ import requests
 import os
 from bs4 import BeautifulSoup
 
+
+# Установите адрес хоста и порт вашего прокси-сервера
+# proxy_host = "10.109.18.4"
+# proxy_port = 3128
+# proxy = {"http": f"http://{proxy_host}:{proxy_port}", "https": f"http://{proxy_host}:{proxy_port}"}
+# requests_proxies = {"http": f"http://{proxy_host}:{proxy_port}", "https": f"http://{proxy_host}:{proxy_port}"}
+proxy = None
+
 def change_image(path, new_size, new_path):
     """
     Изменяет размер изображения.
@@ -24,6 +32,7 @@ def change_image(path, new_size, new_path):
     new_image = image.resize(new_size)
 
     # Сохраняем измененное изображение
+
     new_image.save(new_path)
 
 def split_image(new_path, piece_size):
@@ -62,7 +71,7 @@ def split_image(new_path, piece_size):
 def req(url: str, header: dict)->str:
     '''Получение рандомного изображения с https://www.generatormix.com'''
 
-    response = requests.get(url, headers=header)
+    response = requests.get(url, headers=header, proxies=proxy)
     print(response.status_code)
 
 
@@ -79,7 +88,7 @@ def req(url: str, header: dict)->str:
             img_src = img.get('data-src')
             # сохраняем картинку
             # Отправить HTTP-запрос для получения содержимого изображения
-            response = requests.get(img_src)
+            response = requests.get(img_src, proxies=proxy)
 
             # Проверить успешность запроса
             if response.status_code == 200:
