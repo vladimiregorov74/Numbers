@@ -6,11 +6,11 @@ from bs4 import BeautifulSoup
 
 
 # Установите адрес хоста и порт вашего прокси-сервера
-proxy_host = "10.109.18.4"
-proxy_port = 3128
-proxy = {"http": f"http://{proxy_host}:{proxy_port}", "https": f"http://{proxy_host}:{proxy_port}"}
-requests_proxies = {"http": f"http://{proxy_host}:{proxy_port}", "https": f"http://{proxy_host}:{proxy_port}"}
-
+# proxy_host = "10.109.18.4"
+# proxy_port = 3128
+# proxy = {"http": f"http://{proxy_host}:{proxy_port}", "https": f"http://{proxy_host}:{proxy_port}"}
+# requests_proxies = {"http": f"http://{proxy_host}:{proxy_port}", "https": f"http://{proxy_host}:{proxy_port}"}
+proxy = None
 
 def change_image(path, new_size, new_path):
     """
