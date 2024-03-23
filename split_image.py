@@ -6,11 +6,11 @@ from bs4 import BeautifulSoup
 
 
 # Установите адрес хоста и порт вашего прокси-сервера
-# proxy_host = "10.109.18.4"
-# proxy_port = 3128
-# proxy = {"http": f"http://{proxy_host}:{proxy_port}", "https": f"http://{proxy_host}:{proxy_port}"}
-# requests_proxies = {"http": f"http://{proxy_host}:{proxy_port}", "https": f"http://{proxy_host}:{proxy_port}"}
-proxy = None
+proxy_host = "10.109.18.4"
+proxy_port = 3128
+proxy = {"http": f"http://{proxy_host}:{proxy_port}", "https": f"http://{proxy_host}:{proxy_port}"}
+requests_proxies = {"http": f"http://{proxy_host}:{proxy_port}", "https": f"http://{proxy_host}:{proxy_port}"}
+
 
 def change_image(path, new_size, new_path):
     """
@@ -20,6 +20,7 @@ def change_image(path, new_size, new_path):
     :param новые_размеры: Кортеж (ширина, высота) нового размера.
     :param путь_к_выходному_изображению: Путь к выходному изображению.
     """
+
     # Открываем изображение
     image = Image.open(path)
     # Определяем минимальную сторону
@@ -61,8 +62,16 @@ def split_image(new_path, piece_size):
     n = 0
     pieces_dict = dict()
     for i in range(l):
+        if len(str(i)) < 2:
+            row = '0' + str(i)
+        else:
+            row = str(i)
         for j in range(l):
-            pieces_dict[f'{i}{j}'] = pieces[n]
+            if len(str(j)) < 2:
+                col = '0' + str(j)
+            else:
+                col = str(j)
+            pieces_dict[f'{row}{col}'] = pieces[n]
             n += 1
 
 
@@ -71,8 +80,9 @@ def split_image(new_path, piece_size):
 def req(url: str, header: dict)->str:
     '''Получение рандомного изображения с https://www.generatormix.com'''
 
-    response = requests.get(url, headers=header, proxies=proxy)
-    print(response.status_code)
+    response = requests.get(url, header, proxies=proxy)
+    #response = requests.get(url, headers=header, proxies=proxy)
+    # print(response.status_code)
 
 
     # Убедитесь, что запрос успешен
@@ -147,6 +157,7 @@ def main(n):
 
     # переделываем ключи словаря на строки
     b = dict_piece.keys()
+
     c = [Image.fromarray(i) for i in dict_piece.values()]
 
     dict_pieces = dict(zip(b, c))
