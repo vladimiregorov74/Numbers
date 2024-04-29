@@ -36,6 +36,7 @@ def change_image(path, new_size, new_path):
 
     new_image.save(new_path)
 
+
 def split_image(new_path, piece_size):
     """
     Разбивает изображение на кусочки заданного размера и создает словарь.
@@ -52,13 +53,12 @@ def split_image(new_path, piece_size):
     image_array = np.array(image)
 
     # Разбиваем изображение на кусочки
-    pieces = [image_array[i:i+piece_size[1], j:j+piece_size[0]]
-               for i in range(0, height, piece_size[1])
-               for j in range(0, width, piece_size[0])]
-
+    pieces = [image_array[i:i + piece_size[1], j:j + piece_size[0]]
+              for i in range(0, height, piece_size[1])
+              for j in range(0, width, piece_size[0])]
 
     # Создаем словарь с кортежами в виде (0, 0), (0, 1), (0, 2), и так далее
-    l = int(len(pieces)**0.5)
+    l = int(len(pieces) ** 0.5)
     n = 0
     pieces_dict = dict()
     for i in range(l):
@@ -74,16 +74,15 @@ def split_image(new_path, piece_size):
             pieces_dict[f'{row}{col}'] = pieces[n]
             n += 1
 
-
     return pieces_dict
 
-def req(url: str, header: dict)->str:
+
+def req(url: str, header: dict) -> str:
     '''Получение рандомного изображения с https://www.generatormix.com'''
 
     response = requests.get(url, header, proxies=proxy)
-    #response = requests.get(url, headers=header, proxies=proxy)
+    # response = requests.get(url, headers=header, proxies=proxy)
     # print(response.status_code)
-
 
     # Убедитесь, что запрос успешен
     try:
@@ -130,21 +129,22 @@ def req(url: str, header: dict)->str:
         return path
 
 
-def main(n):
+def main(n, size):
+
 
     url = "https://www.generatormix.com/random-image-generator"
     header = {'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
-                          'User-Agent': 'Mozilla / 5.0(X11; Ubuntu; Linux x86_64; rv: 109.0) Gecko / 20100101 Firefox / 119.0'
-                        }
+              'User-Agent': 'Mozilla / 5.0(X11; Ubuntu; Linux x86_64; rv: 109.0) Gecko / 20100101 Firefox / 119.0'
+              }
     path = req(url, header)
 
     # path = "/home/vladimiregorov/PycharmProjects/Numbers/ai.jpg"
-    new_size = (30*n, 30*n)  # Замените на желаемые размеры
+    new_size = (size * n, size * n)  # Замените на желаемые размеры
     new_path = "output_img.jpg"
-
+    Image.open("ai.jpg").convert("RGB").save("ai.jpg")  # в случае получения файла png конвертируем его в jpeg
     change_image(path, new_size, new_path)
 
-    piece_size = (30, 30)  # по размеру кнопки
+    piece_size = (size, size)  # по размеру кнопки
 
     # Теперь словарь_кусочков содержит индексы и соответствующие кусочки изображения
     dict_piece = split_image(new_path, piece_size)
@@ -167,4 +167,4 @@ def main(n):
 
 if __name__ == '__main__':
     n = 8
-    main(n)
+    main(n, 40)

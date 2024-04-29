@@ -4,8 +4,8 @@ import shutil
 import sys
 import random
 
-
-from PyQt6.QtGui import QPixmap
+from PyQt6.QtCore import Qt, QRectF
+from PyQt6.QtGui import QPixmap, QPainterPath, QRegion
 
 from field1 import Ui_MainWindow
 from PyQt6 import QtCore, QtGui
@@ -20,16 +20,37 @@ class MyApp(QMainWindow, Ui_MainWindow):
         self.setupUi(self)
         # наш код
 
+        # Запретить кнопку развертывания и двойной клик по заголовку
+        self.setWindowFlags(
+            self.windowFlags() & ~Qt.WindowType.WindowMaximizeButtonHint & ~Qt.WindowType.WindowFullscreenButtonHint)
+
         self.move(500, 150)  # располагаем окно посередине
         self.flag = 0  # флаг первого хода
         self.num_step = 0  # счетчик ходов
         self.num_open_img = 0  # счетчик открытых картинок
         self.pushButton.clicked.connect(self.game)  # вызываем функцию для выбора файла
+        self.button_size1 = {i: 40 for i in range(10, 13)}
+        self.button_size2 = {i: (40 + 5 * (10 - i)) for i in range(4, 10)}
+        self.button_size = {**self.button_size2, **self.button_size1}
+        self.round_bottom_corners()
 
     def game(self):
-        text_label = str(self.num_step)
+        text_label = str(f"Ходов: {self.num_step}")
         self.button_new_game = QPushButton('Новая игра')
-        self.button_new_game.setMaximumSize(QtCore.QSize(90, 30))
+        # Изменяем стиль кнопки 'Новая игра'
+        self.button_new_game.setStyleSheet("""
+                                        QPushButton {
+                                            background-color: #9595ED;
+                                            color: white;
+                                            font-size: 18px;
+                                            border-radius: 10px;
+                                            padding: 10px;
+                                        }
+                                        QPushButton:hover {
+                                            background-color: DarkRed;
+                                        }
+                                    """)
+        self.button_new_game.setMaximumSize(QtCore.QSize(150, 40))
         self.horizontalLayout.addWidget(self.button_new_game)
         self.pushButton.hide()
         self.spinBox.hide()
@@ -38,11 +59,12 @@ class MyApp(QMainWindow, Ui_MainWindow):
         self.action_2.triggered.connect(self.save_img)
 
         self.size = self.spinBox.value()  # размер игрового поля
+        self.size1 = self.size
         if len(str(self.size)) < 2:
             self.size = '0' + str(self.size)
         else:
-             self.size= str(self.size)
-        self.dict_piece = main(int(self.size))  # получаем кусочки картинки в словарь
+            self.size = str(self.size)
+        self.dict_piece = main(int(self.size), self.button_size[self.size1])  # получаем кусочки картинки в словарь
         # Создаем список чисел
         num0 = [i for i in range(int((int(self.size) ** 2) / 2))]
         num = num0 + num0
@@ -56,7 +78,7 @@ class MyApp(QMainWindow, Ui_MainWindow):
         # а значение цифры открываемые кнопками
         self.button_num = dict()
         for row in range(int(self.size)):
-            if len(str(row))< 2:
+            if len(str(row)) < 2:
                 row = '0' + str(row)
             else:
                 row = str(row)
@@ -68,6 +90,19 @@ class MyApp(QMainWindow, Ui_MainWindow):
                 self.button_num[f'{row}{col}'] = num.pop()
         # функция создания кнопок
         self.create_buttons()
+        # Изменяем цвет окна
+        # self.central_widget.setStyleSheet("background-color: Linen;")
+        self.setStyleSheet("""
+                                QMainWindow {
+                                    background-color: PaleTurquoise;
+                                }
+                            """)
+    def resizeEvent(self, event):
+        # Переопределяем метод resizeEvent() в нашем классе MyApp, чтобы автоматически обновлять маску
+        # при изменении размеров окна:
+
+        self.round_bottom_corners()
+        super().resizeEvent(event)  # Передаем событие в базовый класс
 
     def create_buttons(self):
         '''Создаем кнопки игрового поля'''
@@ -80,7 +115,7 @@ class MyApp(QMainWindow, Ui_MainWindow):
         # Задаем отступы вокруг компоновщика
         self.field_layout.setContentsMargins(1, 1, 1, 1)
         for row in range(int(self.size)):
-            if len(str(row))< 2:
+            if len(str(row)) < 2:
                 row = '0' + str(row)
             else:
                 row = str(row)
@@ -91,15 +126,27 @@ class MyApp(QMainWindow, Ui_MainWindow):
                     col = str(col)
                 button = QPushButton('')
                 button.setObjectName(f"Button{row}{col}")
-                button.setMaximumSize(QtCore.QSize(30, 30))
-                button.setMinimumSize(QtCore.QSize(30, 30))
-                button.setStyleSheet("background-color: rgb(74, 161, 228);color: black")
+                button.setMaximumSize(QtCore.QSize(self.button_size[self.size1], self.button_size[self.size1]))
+                button.setMinimumSize(QtCore.QSize(self.button_size[self.size1], self.button_size[self.size1]))
+                # button.setStyleSheet("background-color: rgb(74, 161, 228);color: black")
+                button.setStyleSheet("""
+                                        QPushButton {
+                                            background-color: #6495ED;
+                                            color: white;
+                                            font-size: 18px;
+                                            border-radius: 10px;
+                                            padding: 10px;
+                                        }
+                                        QPushButton:hover {
+                                            background-color: navy;
+                                        }
+                                    """)
                 button.clicked.connect(self.button_clicked)  # Связываем каждую кнопку с обработчиком
                 self.field_layout.addWidget(button, int(row), int(col))
                 self.dict_button[f"Button{row}{col}"] = button
 
         self.verticalLayout.addLayout(self.field_layout)
-        self.setMaximumWidth(int(self.size) * 35 + 10)
+        self.setMaximumWidth(int(self.size) *(self.button_size[self.size1]+5) + 10)
         # открываем центральную плашку при нечетном размере поля
         if int(self.size) % 2 == 1:
             a = int(self.size) // 2
@@ -109,6 +156,7 @@ class MyApp(QMainWindow, Ui_MainWindow):
             self.set_image_to_button(self.dict_button["Button" + ind], ind)
             self.dict_button["Button" + ind].setEnabled(False)
             self.num_open_img = 1
+
 
     def button_clicked(self):
         # Обработчик нажатия на кнопку
@@ -170,7 +218,7 @@ class MyApp(QMainWindow, Ui_MainWindow):
         icon.addPixmap(QtGui.QPixmap(paths), QtGui.QIcon.Mode.Normal, QtGui.QIcon.State.Off)
         icon.addPixmap(QtGui.QPixmap(paths), QtGui.QIcon.Mode.Disabled, QtGui.QIcon.State.Off)
         but.setIcon(icon)
-        but.setIconSize(QtCore.QSize(30, 30))
+        but.setIconSize(QtCore.QSize(self.button_size[int(self.size)], self.button_size[int(self.size)]))
 
     def show_img(self):
         self.move(10, 0)
@@ -183,14 +231,15 @@ class MyApp(QMainWindow, Ui_MainWindow):
         if width > height:
 
             if width > big_side:
-                height = int(height*big_side/width)
+                height = int(height * big_side / width)
                 width = big_side
 
         else:
-            width = int(width*big_side/height)
+            width = int(width * big_side / height)
             height = big_side
 
         # Убираем кнопки и выводим лейбел
+        self.move(500, 150)
         for i in self.dict_button.values():
             i.hide()
         label = QLabel('Label')
@@ -206,7 +255,6 @@ class MyApp(QMainWindow, Ui_MainWindow):
         self.verticalLayout.addWidget(label)
         self.action_2.setEnabled(True)
 
-
     def save_img(self):
         options = QFileDialog.Option.ShowDirsOnly  # Показывать только директории
 
@@ -217,12 +265,11 @@ class MyApp(QMainWindow, Ui_MainWindow):
         if file_name:
             source_file = "ai.jpg"
             destination_file = file_name
-            if destination_file.split('.')[-1] != "jpg" or destination_file.split('.')[-1] != "jpeg" :
+            if destination_file.split('.')[-1] != "jpg" or destination_file.split('.')[-1] != "jpeg":
                 destination_file = file_name + ".jpg"
 
             shutil.copy(source_file, destination_file)
             # print(f"File '{source_file}' copied to '{destination_file}'")
-
 
     def new_game(self):
         self.close()
@@ -232,10 +279,29 @@ class MyApp(QMainWindow, Ui_MainWindow):
         window = MyApp(parent=self)
         window.show()
 
+    def round_bottom_corners(self):
+        # Определяем радиус скругления только для нижних углов
+        radius = 40
+
+        # Создаем путь
+        path = QPainterPath()
+        path.moveTo(0, 0)  # Начинаем с верхнего левого угла
+        path.lineTo(0, self.height() - radius)  # Вертикальная линия вниз
+        path.arcTo(QRectF(0, self.height() - radius, radius, radius), 180, 90)  # Дуга нижнего левого угла
+        path.lineTo(self.width() - radius, self.height())  # Горизонтальная линия вправо
+        path.arcTo(QRectF(self.width() - radius, self.height() - radius, radius, radius), 270,
+                   90)  # Дуга нижнего правого угла
+        path.lineTo(self.width(), 0)  # Вертикальная линия вверх
+        path.lineTo(0, 0)  # Замыкание контура
+
+        # Создаем маску из этого пути
+        region = QRegion(path.toFillPolygon().toPolygon())
+
+        # Применяем маску к окну
+        self.setMask(region)
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     window = MyApp()
     window.show()
     sys.exit(app.exec())
-
-

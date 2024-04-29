@@ -13,8 +13,15 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(608, 170)
+        MainWindow.setStyleSheet("""
+                                    #MainWindow {
+                                        background-color: DeepSkyBlue;
+                                        color: white;
+                                    }
+                                """)
         self.centralwidget = QtWidgets.QWidget(parent=MainWindow)
         self.centralwidget.setObjectName("centralwidget")
+
         self.verticalLayout = QtWidgets.QVBoxLayout(self.centralwidget)
         self.verticalLayout.setObjectName("verticalLayout")
         self.horizontalLayout = QtWidgets.QHBoxLayout()
@@ -26,6 +33,15 @@ class Ui_MainWindow(object):
         spacerItem = QtWidgets.QSpacerItem(40, 20, QtWidgets.QSizePolicy.Policy.Expanding, QtWidgets.QSizePolicy.Policy.Minimum)
         self.horizontalLayout.addItem(spacerItem)
         self.spinBox = QtWidgets.QSpinBox(parent=self.centralwidget)
+        self.spinBox.setStyleSheet("""
+                                        QSpinBox {                                            
+                                            color: blue;
+                                            font-size: 22px;  
+                                            height: 30px;
+                                            width:  50px;
+                                            }
+                                        
+                                        """)
         self.spinBox.setMinimumSize(QtCore.QSize(50, 30))
         self.spinBox.setAlignment(QtCore.Qt.AlignmentFlag.AlignRight|QtCore.Qt.AlignmentFlag.AlignTrailing|QtCore.Qt.AlignmentFlag.AlignVCenter)
         self.spinBox.setMinimum(4)
@@ -37,8 +53,19 @@ class Ui_MainWindow(object):
         self.horizontalLayout.addItem(spacerItem1)
         self.pushButton = QtWidgets.QPushButton(parent=self.centralwidget)
         self.pushButton.setMinimumSize(QtCore.QSize(90, 30))
-        self.pushButton.setStyleSheet("background-color: rgb(143, 240, 164);\n"
-"alternate-background-color: rgb(34, 215, 241);")
+        self.pushButton.setStyleSheet("""
+                                        QPushButton {
+                                            background-color: blue;
+                                            color: white;
+                                            font-size: 16px;
+                                            border-radius: 10px;
+                                            padding: 10px;
+                                            }
+                                        QPushButton:hover {
+                                            background-color: navy;
+                                            }
+                                        """)
+        #self.pushButton.setStyleSheet("background-color: rgb(143, 240, 164); alternate-background-color: rgb(34, 215, 241);")
         self.pushButton.setObjectName("pushButton")
         self.horizontalLayout.addWidget(self.pushButton)
         self.verticalLayout.addLayout(self.horizontalLayout)
@@ -49,6 +76,24 @@ class Ui_MainWindow(object):
         self.menuMenu = QtWidgets.QMenu(parent=self.menubar)
         self.menuMenu.setObjectName("menuMenu")
         self.menu = QtWidgets.QMenu(parent=self.menuMenu)
+        self.menu.setStyleSheet("""
+                                QMenu {
+                                    background-color: Wheat;
+                                    color: black;
+                                    font-size: 16px;
+                                }
+                                
+                            """)
+        self.menu_2 = QtWidgets.QMenu(parent=self.menuMenu)
+        self.menu_2.setObjectName("menu_2")
+        self.menu_2.setStyleSheet("""
+                                        QMenu {
+                                            background-color: Wheat;
+                                            color: black;
+                                            font-size: 16px;
+                                        }
+                                        
+                                    """)
         self.menu.setObjectName("menu")
         MainWindow.setMenuBar(self.menubar)
         self.action = QtGui.QAction(parent=MainWindow)
@@ -61,9 +106,13 @@ class Ui_MainWindow(object):
         self.action_2.setCheckable(False)
         self.action_2.setEnabled(False)
         self.action_2.setObjectName("action_2")
+        self.action_5 = QtGui.QAction(parent=MainWindow)
+        self.action_5.setObjectName("action_5")
         self.menu.addAction(self.action_3)
+        self.menu_2.addAction(self.action_5)
         self.menuMenu.addAction(self.action_2)
         self.menuMenu.addAction(self.menu.menuAction())
+        self.menuMenu.addAction(self.menu_2.menuAction())
         self.menubar.addAction(self.menuMenu.menuAction())
 
         self.retranslateUi(MainWindow)
@@ -79,6 +128,8 @@ class Ui_MainWindow(object):
 
         self.action_3.setText(_translate("MainWindow", "Егоров В.А."))
         self.action_2.setText(_translate("MainWindow", "Сохранить полученную картинку"))
+        self.menu_2.setTitle(_translate("MainWindow", "Справка"))
+        self.action_5.setText(_translate("MainWindow", "Откройте одинаковые цифры и увидите картинку."))
 
 
 if __name__ == "__main__":
